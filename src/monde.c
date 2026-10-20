@@ -1,5 +1,10 @@
 #include <stdlib.h>
+#include <math.h>
 #include "monde.h"
+
+/* Part du monde occupee par l'ensemble des amas (meme valeur en 2D et en 3D,
+   pour que la densite dans les amas soit comparable : ici 10x la densite moyenne) */
+#define OCCUPATION_AMAS 0.10f
 
 /* Distance au carré entre deux points */
 float distance_carre(Point p1, Point p2) {
@@ -82,8 +87,13 @@ Monde creer_monde_amas(int nb, float taille, float rayon, int nb_amas, int en_3d
         (centres + c)->z = en_3d ? hasard(0, taille) : 0;
     }
 
-    /* place les objets autour */
-    float ecart = taille / 20;   /* taille d'un amas */
+    /* place les objets autour.
+       Chaque amas est un carre (cube en 3D) de cote c, avec nb_amas * c^d = OCCUPATION_AMAS * taille^d
+       donc c = taille * (OCCUPATION_AMAS / nb_amas)^(1/d).
+       Avec 10 amas : c = taille / 10 en 2D, c = taille / 4.6 en 3D. */
+    float dimension = en_3d ? 3.0f : 2.0f;
+    float cote = taille * powf(OCCUPATION_AMAS / nb_amas, 1.0f / dimension);
+    float ecart = cote / 2;   /* demi-cote d'un amas */
     for (int i = 0; i < nb; i++) {
         Objet* objet = monde.objets + i;
         Point* centre = centres + (i % nb_amas);   /* on répartit les objets */

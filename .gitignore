@@ -3,3 +3,5 @@
 algo-jeu
 
 .vscode/
+benchmark
+__pycache__/
